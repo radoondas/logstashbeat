@@ -1,0 +1,4 @@
+beat_name: logstashbeat
+beat_url: 'https://github.com/radoondas'
+beat_repo: 'github.com/radoondas'
+beat_description: Sends logstashbeat metrics to Logstash or directly to Elasticsearch.

@@ -1,0 +1,8 @@
+/.idea
+/build
+
+.DS_Store
+/logstashbeat
+/logstashbeat.test
+*.pyc
+/logstashbeat.iml

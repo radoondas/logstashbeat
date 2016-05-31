@@ -1,6 +1,9 @@
 # Logstashbeat
 
-Welcome to Logstashbeat.
+**Note: this is development version**
+**Note: beat works only with Logstash v5**
+
+Welcome to Logstashbeat which queries metrics from Logstash and index them in Elasticsearch.
 
 Ensure that this folder is at the following location:
 `${GOPATH}/github.com/radoondas`
@@ -11,30 +14,6 @@ Ensure that this folder is at the following location:
 
 * [Golang](https://golang.org/dl/) 1.6
 * [Glide](https://github.com/Masterminds/glide) >= 0.10.0
-
-### Init Project
-To get running with Logstashbeat, run the following command:
-
-```
-make init
-```
-
-To commit the first version before you modify it, run:
-
-```
-make commit
-```
-
-It will create a clean git history for each major step. Note that you can always rewrite the history if you wish before pushing your changes.
-
-To push Logstashbeat in the git repository, run the following commands:
-
-```
-git remote set-url origin https://github.com/radoondas/logstashbeat
-git push origin master
-```
-
-For further development, check out the [beat developer guide](https://www.elastic.co/guide/en/beats/libbeat/current/new-beat.html).
 
 ### Build
 
@@ -55,7 +34,7 @@ To run Logstashbeat with debugging output enabled, run:
 ```
 
 
-### Test
+### Test (not implemented yet)
 
 To test Logstashbeat, run the following command:
 
@@ -126,6 +105,3 @@ mkdir -p ${GOPATH}/github.com/radoondas
 cd ${GOPATH}/github.com/radoondas
 git clone https://github.com/radoondas/logstashbeat
 ```
-
-
-For further development, check out the [beat developer guide](https://www.elastic.co/guide/en/beats/libbeat/current/new-beat.html).

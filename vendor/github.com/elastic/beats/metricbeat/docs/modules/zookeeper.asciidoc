@@ -1,20 +1,35 @@
-[[metricbeat-zookeeper-module]]
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-zookeeper]]
 == Zookeeper Module
 
 
-=== Configuration
+
+
+[float]
+=== Example Configuration
+
+The Zookeeper Status module supports the standard configuration options which can be found
+here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
-metricbeat:
-  modules:
-    - module: zookeeper
-      metricsets: ["mntr"]
-      hosts: ["localhost:2181"]
-      period: 1s
+metricbeat.modules:
+- module: zookeeper
+  metricsets: ["mntr"]
+  enabled: true
+  period: 5s
+  hosts: ["localhost:2181"]
 ----
 
+[float]
 === MetricSets
 
-==== mntr Metricset
+The following MetricSets are available:
+
+* <<metricbeat-metricset-zookeeper-mntr,mntr>>
+
+include::zookeeper/mntr.asciidoc[]
 

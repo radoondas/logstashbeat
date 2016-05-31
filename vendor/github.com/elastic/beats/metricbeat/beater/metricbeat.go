@@ -1,32 +1,3 @@
-/*
-Package beater provides the implementation of the libbeat Beater interface for
-Metricbeat. The main event loop is implemented in this package. The public
-interfaces used in implementing Modules and MetricSets are defined in the
-github.com/elastic/beats/metricbeat/mb package.
-
-Metricbeat collects metric sets from different modules.
-
-Each event created has the following format:
-
-	curl -XPUT http://localhost:9200/metricbeat/metricsets -d
-	{
-		"metriset": metricsetName,
-		"module": moduleName,
-		"moduleName-metricSetName": {
-			"metric1": "value",
-			"metric2": "value",
-			"metric3": "value",
-			"nestedmetric": {
-				"metric4": "value"
-			}
-		},
-		"@timestamp": timestamp
-	}
-
-All documents are stored in one index called metricbeat. It is important to use
-an independent namespace for each MetricSet to prevent type conflicts. Also all
-values are stored under the same type "metricsets".
-*/
 package beater
 
 import (
@@ -34,7 +5,9 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/pkg/errors"
@@ -44,7 +17,8 @@ import (
 type Metricbeat struct {
 	done    chan struct{}    // Channel used to initiate shutdown.
 	config  *Config          // Metricbeat specific configuration data.
-	modules []*moduleWrapper // Active list of modules.
+	modules []*ModuleWrapper // Active list of modules.
+	client  publisher.Client // Publisher client.
 }
 
 // New creates and returns a new Metricbeat instance.
@@ -71,7 +45,7 @@ func (bt *Metricbeat) Config(b *beat.Beat) error {
 func (bt *Metricbeat) Setup(b *beat.Beat) error {
 	var err error
 	bt.done = make(chan struct{})
-	bt.modules, err = newModuleWrappers(bt.config.Modules, mb.Registry, b.Publisher)
+	bt.modules, err = NewModuleWrappers(bt.config.Modules, mb.Registry)
 	return err
 }
 
@@ -81,14 +55,25 @@ func (bt *Metricbeat) Setup(b *beat.Beat) error {
 // that a single unresponsive host cannot inadvertently block other hosts
 // within the same Module and MetricSet from collection.
 func (bt *Metricbeat) Run(b *beat.Beat) error {
-	var wg sync.WaitGroup
+	// Start each module.
+	var cs []<-chan common.MapStr
 	for _, mw := range bt.modules {
-		wg.Add(len(mw.metricSets))
-		for _, msw := range mw.metricSets {
-			go msw.startFetching(bt.done, &wg)
-		}
+		c := mw.Start(bt.done)
+		cs = append(cs, c)
 	}
 
+	// Consume data from all modules and publish it. When the modules stop they
+	// close their output channels. When all the modules' channels are closed
+	// PublishChannels exit.
+	bt.client = b.Publisher.Connect()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		PublishChannels(bt.client, cs...)
+	}()
+
+	// Wait for PublishChannels to stop publishing.
 	wg.Wait()
 	return nil
 }
@@ -111,7 +96,5 @@ func (bt *Metricbeat) Cleanup(b *beat.Beat) error {
 // result in undefined behavior.
 func (bt *Metricbeat) Stop() {
 	close(bt.done)
-	for _, moduleWrapper := range bt.modules {
-		moduleWrapper.pubClient.Close()
-	}
+	bt.client.Close()
 }

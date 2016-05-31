@@ -1,37 +1,18 @@
-###################### Topbeat Configuration Example ##########################
+################### Logstashbeat Configuration Example #########################
 
-# This file is an example configuration file highlighting only the most common
-# options. The topbeat.full.yml file from the same directory contains all the
-# supported options with more comments. You can use it as a reference.
-#
-# You can find the full configuration reference here:
-# https://www.elastic.co/guide/en/beats/topbeat/index.html
+############################# Logstashbeat ######################################
 
-#======================== Topbeat specific options ============================
+logstashbeat:
+  # Defines how often an event is sent to the output
+  period: 5s
 
-# In seconds, defines how often to read server statistics
-topbeat.period: 10
+  urls: ["http://127.0.0.1:9600"]
 
-# Regular expression to match the processes that are monitored
-# By default, all the processes are monitored
-topbeat.procs: [".*"]
+  node:
+    events: true
+    jvm: true
+    process: false
 
-# Statistics to collect (all enabled by default)
-topbeat.stats:
-  # per system statistics, by default is true
-  system: true
-
-  # per process statistics, by default is true
-  process: true
-
-  # file system information, by default is true
-  filesystem: true
-
-  # cpu usage per core, by default is false
-  core: false
-
-  # cpu usage expressed in ticks, by default is false
-  cpu_ticks: false
 
 #================================ General =====================================
 
@@ -58,11 +39,11 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Template name. By default the template name is topbeat.
-  template.name: "topbeat"
+  # Template name. By default the template name is logstashbeat.
+  template.name: "logstashbeat"
 
   # Path to template file
-  template.path: "topbeat.template.json"
+  template.path: "logstashbeat.template.json"
 
   # Overwrite existing template
   template.overwrite: false

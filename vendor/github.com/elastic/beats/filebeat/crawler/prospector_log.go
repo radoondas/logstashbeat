@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"time"
 
-	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/logp"
@@ -14,14 +13,14 @@ import (
 type ProspectorLog struct {
 	Prospector *Prospector
 	lastscan   time.Time
-	config     cfg.ProspectorConfig
+	config     prospectorConfig
 }
 
 func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 
 	prospectorer := &ProspectorLog{
 		Prospector: p,
-		config:     p.ProspectorConfig,
+		config:     p.config,
 	}
 
 	return prospectorer, nil
@@ -31,32 +30,28 @@ func (p *ProspectorLog) Init() {
 	logp.Debug("prospector", "exclude_files: %s", p.config.ExcludeFiles)
 
 	logp.Info("Load previous states from registry into memory")
+	fileStates := p.Prospector.states.GetStates()
 
-	// Load the initial state from the registry
-	for path, fileinfo := range p.getFiles() {
-
-		// Check for each path found, if there is a previous state
-		offset := p.Prospector.registrar.fetchState(path, fileinfo)
-
-		// Offset found -> skip to previous state
-		if offset > 0 {
-			state := input.NewFileState(fileinfo, path)
-			state.Offset = offset
-			// Make sure new harvester is started for all states
-			state.Finished = true
-			// Prospector must update all states as it has to detect also file rotation
-			p.Prospector.updateState(state)
-		}
+	// Make sure all states are set as finished
+	for key, state := range fileStates {
+		state.Finished = true
+		fileStates[key] = state
 	}
 
-	logp.Info("Previous states loaded: %v", len(p.Prospector.harvesterStates))
+	// Overwrite prospector states
+	p.Prospector.states.SetStates(fileStates)
+
+	logp.Info("Previous states loaded: %v", p.Prospector.states.Count())
 }
 
 func (p *ProspectorLog) Run() {
 	logp.Debug("prospector", "Start next scan")
 
 	p.scan()
-	p.Prospector.cleanupStates()
+	// Only cleanup states if enabled
+	if p.config.IgnoreOlder != 0 {
+		p.Prospector.states.Cleanup(p.config.IgnoreOlder)
+	}
 }
 
 // getFiles returns all files which have to be harvested
@@ -108,7 +103,6 @@ func (p *ProspectorLog) scan() {
 	newlastscan := time.Now()
 
 	// TODO: Track harvesters to prevent any file from being harvested twice. Finished state could be delayed?
-
 	// Now let's do one quick scan to pick up new files
 	for file, fileinfo := range p.getFiles() {
 
@@ -117,11 +111,8 @@ func (p *ProspectorLog) scan() {
 		// Create new state for comparison
 		newState := input.NewFileState(fileinfo, file)
 
-		// TODO: This currently blocks writing updates every time state is fetched. Should be improved for performance
-		p.Prospector.stateMutex.Lock()
 		// Load last state
-		index, lastState := p.Prospector.findPreviousState(newState)
-		p.Prospector.stateMutex.Unlock()
+		index, lastState := p.Prospector.states.FindPrevious(newState)
 
 		// Decides if previous state exists
 		if index == -1 {

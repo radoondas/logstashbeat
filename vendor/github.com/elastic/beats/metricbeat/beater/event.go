@@ -1,7 +1,6 @@
 package beater
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -24,7 +23,7 @@ type eventBuilder struct {
 	fetchDuration time.Duration
 	event         common.MapStr
 	fetchErr      error
-	filters       *filter.FilterList
+	filters       *filter.Filters
 	metadata      common.EventMetadata
 }
 
@@ -42,9 +41,6 @@ func (b eventBuilder) build() (common.MapStr, error) {
 	typeName := getType(event, defaultType)
 	timestamp := getTimestamp(event, common.Time(b.startTime))
 
-	// Each metricset has a unique event field name to prevent type conflicts.
-	eventFieldName := fmt.Sprintf("%s-%s", b.moduleName, b.metricSetName)
-
 	// Apply filters.
 	if b.filters != nil {
 		event = b.filters.Filter(event)
@@ -53,11 +49,16 @@ func (b eventBuilder) build() (common.MapStr, error) {
 	event = common.MapStr{
 		"@timestamp": timestamp,
 		"type":       typeName,
-		"module":     b.moduleName,
-		"metricset":  b.metricSetName,
-		"rtt":        b.fetchDuration.Nanoseconds() / int64(time.Microsecond),
+
 		common.EventMetadataKey: b.metadata,
-		eventFieldName:          event,
+		b.moduleName: common.MapStr{
+			b.metricSetName: event,
+		},
+		"metricset": common.MapStr{
+			"module": b.moduleName,
+			"name":   b.metricSetName,
+			"rtt":    b.fetchDuration.Nanoseconds() / int64(time.Microsecond),
+		},
 	}
 
 	// Overwrite default index if set.
@@ -72,7 +73,7 @@ func (b eventBuilder) build() (common.MapStr, error) {
 	if b.host != "" {
 		// TODO (akroh): allow metricset to specify this value so that
 		// a proper URL can be specified and passwords be redacted.
-		event["metricset-host"] = b.host
+		event["metricset"].(common.MapStr)["host"] = b.host
 	}
 
 	// Adds error to event in case error happened

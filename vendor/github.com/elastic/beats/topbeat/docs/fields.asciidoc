@@ -9,16 +9,28 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Topbeat. They are
 grouped in the following categories:
 
-* <<exported-fields-env>>
-* <<exported-fields-system>>
-* <<exported-fields-process>>
+* <<exported-fields-beat>>
+* <<exported-fields-common>>
+* <<exported-fields-core>>
 * <<exported-fields-filesystem>>
+* <<exported-fields-process>>
+* <<exported-fields-system>>
 
-[[exported-fields-env]]
-=== Common Fields
+[[exported-fields-beat]]
+=== Beat Fields
 
-Contains common fields available in all event types.
+Contains common beat fields available in all event types.
 
+
+
+==== beat.name
+
+The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+
+
+==== beat.hostname
+
+The hostname as returned by the operating system on which the Beat is running.
 
 
 ==== @timestamp
@@ -31,24 +43,7 @@ format: YYYY-MM-DDTHH:MM:SS.milliZ
 
 required: True
 
-The timestamp of when the measurements were taken. The precision is in milliseconds. The timezone is UTC.
-
-
-==== type
-
-required: True
-
-Set to "system" to indicate that the statistics are system-wide.
-
-
-==== beat.name
-
-Name of the Beat sending the events. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
-
-
-==== beat.hostname
-
-The hostname as returned by the operating system on which the Beat is running.
+The timestamp when the event log record was generated.
 
 
 ==== tags
@@ -63,277 +58,205 @@ type: dict
 Contains user configurable fields.
 
 
-[[exported-fields-system]]
-=== System-Wide Statistics Fields
+[[exported-fields-common]]
+=== Common Fields
 
-Contains system-wide statistics. These statistics are the details that you can get by running the *top* command on Unix systems.
+Contains common fields available in all event types.
 
 
 
-[float]
-=== load Fields
+==== type
 
-The system load average. The load average is the average number of jobs in the run queue.
+required: True
 
+Set to "system" to indicate that the statistics are system-wide.
 
 
-==== load.load1
+[[exported-fields-core]]
+=== CPU statistics per core Fields
 
-type: float
+Contains CPU statistics for each core. These statistics are the details that you can get by running the *top* command on Unix systems.
 
-The load average over 1 minute.
 
 
-==== load.load5
+==== id
 
-type: float
+type: integer
 
-The load average over 5 minutes.
+The id of the core X.
 
 
-==== load.load15
-
-type: float
-
-The load average over 15 minutes.
-
-
-[float]
-=== cpu Fields
-
-This group contains statistics related to CPU usage.
-
-
-==== cpu.user
-
-type: long
-
-The amount of CPU time spent in user space.
-
-
-==== cpu.user_p
-
-type: float
-
-The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
-
-
-==== cpu.nice
-
-type: long
-
-The amount of CPU time spent on low-priority processes.
-
-
-==== cpu.system
-
-type: long
-
-The amount of CPU time spent in kernel space.
-
-
-==== cpu.system_p
-
-type: float
-
-The percentage of CPU time spent in kernel space.
-
-
-==== cpu.idle
-
-type: long
-
-The amount of CPU time spent idle.
-
-
-==== cpu.iowait
-
-type: long
-
-The amount of CPU time spent in wait (on disk).
-
-
-==== cpu.irq
-
-type: long
-
-The amount of CPU time spent servicing and handling hardware interrupts.
-
-
-==== cpu.softirq
-
-type: long
-
-The amount of CPU time spent servicing and handling software interrupts.
-
-==== cpu.steal
-
-type: long
-
-The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
-
-
-[float]
-=== cpus Fields
-
-This group contains CPU usage per core statistics.
-
-
-[float]
-=== cpuX Fields
-
-This group contains CPU usage statistics of the core X, where 0<X<N and N is the number of cores.
-
-
-==== cpus.cpuX.user
+==== user
 
 type: long
 
 The amount of CPU time spent in user space on core X.
 
 
-==== cpus.cpuX.user_p
+==== user_p
 
 type: float
 
 The percentage of CPU time spent in user space on core X.
 
 
-==== cpus.cpuX.nice
+==== nice
 
 type: long
 
 The amount of CPU time spent on low-priority processes on core X.
 
 
-==== cpus.cpuX.system
+==== nice_p
+
+type: float
+
+The percentage of CPU time spent on low-priority processes on core X.
+
+
+==== system
 
 type: long
 
 The amount of CPU time spent in kernel space on core X.
 
 
-==== cpus.cpuX.system_p
+==== system_p
 
 type: float
 
 The percentage of CPU time spent in kernel space on core X.
 
 
-==== cpus.cpuX.idle
+==== idle
 
 type: long
 
 The amount of CPU time spent idle on core X.
 
 
-==== cpus.cpuX.iowait
+==== idle_p
+
+type: float
+
+The percentage of CPU time spent idle on core X.
+
+
+==== iowait
 
 type: long
 
 The amount of CPU time spent in wait (on disk) on core X.
 
 
-==== cpus.cpuX.softirq
+==== iowait_p
+
+type: float
+
+The percentage of CPU time spent in wait (on disk) on core X.
+
+
+==== softirq
 
 type: long
 
 The amount of CPU time spent servicing and handling software interrupts on core X.
 
-==== cpus.cpuX.steal
+==== softirq_p
+
+type: float
+
+The percentage of CPU time spent servicing and handling software interrupts on core X.
+
+==== steal
 
 type: long
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor on core X. Available only on Unix.
 
 
-[float]
-=== mem Fields
-
-This group contains statistics related to the memory usage on the system.
-
-
-==== mem.total
-
-type: long
-
-Total memory.
-
-
-==== mem.used
-
-type: long
-
-Used memory.
-
-
-==== mem.free
-
-type: long
-
-Available memory.
-
-
-==== mem.used_p
+==== steal_p
 
 type: float
 
-The percentage of used memory.
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor on core X. Available only on Unix.
 
 
-==== mem.actual_used
+[[exported-fields-filesystem]]
+=== File System Statistics Fields
 
-type: long
+File system-related statistics that you can get by using the *df* command on Unix systems.
 
-Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
-
-
-==== mem.actual_free
-
-type: long
-
-Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
-
-
-==== mem.actual_used_p
-
-type: float
-
-The percentage of actual used memory.
 
 
 [float]
-=== swap Fields
+=== fs Fields
 
-This group contains statistics related to the swap memory usage on the system.
-
-
-==== swap.total
-
-type: long
-
-Total swap memory.
+Contains details about the mounted disks, such as the total or used disk space, and details about each disk, such as the device name and the mounting place.
 
 
-==== swap.used
+
+==== fs.avail
 
 type: long
 
-Used swap memory.
+The disk space available to an unprivileged user in bytes.
 
 
-==== swap.free
+==== fs.device_name
+
+type: keyword
+
+The disk name. For example: `/dev/disk1`
+
+
+==== fs.mount_point
+
+type: keyword
+
+The mounting point. For example: `/`
+
+
+==== fs.files
 
 type: long
 
-Available swap memory.
+The total number of file nodes in the file system.
 
 
-==== swap.used_p
+==== fs.free
+
+type: long
+
+The disk space available in bytes.
+
+
+==== fs.free_files
+
+type: long
+
+The number of free file nodes in the file system.
+
+
+==== fs.total
+
+type: long
+
+The total disk space in bytes.
+
+
+==== fs.used
+
+type: long
+
+The used disk space in bytes.
+
+
+==== fs.used_p
 
 type: float
 
-The percentage of used swap memory.
+The percentage of used disk space.
 
 
 [[exported-fields-process]]
@@ -467,80 +390,243 @@ type: long
 The shared memory the process uses.
 
 
-[[exported-fields-filesystem]]
-=== File System Statistics Fields
+[[exported-fields-system]]
+=== System-Wide Statistics Fields
 
-File system-related statistics that you can get by using the *df* command on Unix systems.
+Contains system-wide statistics. These statistics are the details that you can get by running the *top* command on Unix systems.
 
 
 
 [float]
-=== fs Fields
+=== load Fields
 
-Contains details about the mounted disks, such as the total or used disk space, and details about each disk, such as the device name and the mounting place.
-
-
-
-==== fs.avail
-
-type: long
-
-The disk space available to an unprivileged user in bytes.
+The system load average. The load average is the average number of jobs in the run queue.
 
 
-==== fs.device_name
 
-type: keyword
-
-The disk name. For example: `/dev/disk1`
-
-
-==== fs.mount_point
-
-type: keyword
-
-The mounting point. For example: `/`
-
-
-==== fs.files
-
-type: long
-
-The total number of file nodes in the file system.
-
-
-==== fs.free
-
-type: long
-
-The disk space available in bytes.
-
-
-==== fs.free_files
-
-type: long
-
-The number of free file nodes in the file system.
-
-
-==== fs.total
-
-type: long
-
-The total disk space in bytes.
-
-
-==== fs.used
-
-type: long
-
-The used disk space in bytes.
-
-
-==== fs.used_p
+==== load.load1
 
 type: float
 
-The percentage of used disk space.
+The load average over 1 minute.
+
+
+==== load.load5
+
+type: float
+
+The load average over 5 minutes.
+
+
+==== load.load15
+
+type: float
+
+The load average over 15 minutes.
+
+
+[float]
+=== cpu Fields
+
+This group contains statistics related to CPU usage.
+
+
+==== cpu.user
+
+type: long
+
+The amount of CPU time spent in user space.
+
+
+==== cpu.user_p
+
+type: float
+
+The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+
+
+==== cpu.nice
+
+type: long
+
+The amount of CPU time spent on low-priority processes.
+
+
+==== cpu.nice_p
+
+type: float
+
+The percentage of CPU time spent on low-priority processes.
+
+
+==== cpu.system
+
+type: long
+
+The amount of CPU time spent in kernel space.
+
+
+==== cpu.system_p
+
+type: float
+
+The percentage of CPU time spent in kernel space.
+
+
+==== cpu.idle
+
+type: long
+
+The amount of CPU time spent idle.
+
+
+==== cpu.idle_p
+
+type: float
+
+The percentage of CPU time spent idle.
+
+
+==== cpu.iowait
+
+type: long
+
+The amount of CPU time spent in wait (on disk).
+
+
+==== cpu.iowait_p
+
+type: float
+
+The percentage of CPU time spent in wait (on disk).
+
+
+==== cpu.irq
+
+type: long
+
+The amount of CPU time spent servicing and handling hardware interrupts.
+
+
+==== cpu.irq_p
+
+type: float
+
+The percentage of CPU time spent servicing and handling hardware interrupts.
+
+
+==== cpu.softirq
+
+type: long
+
+The amount of CPU time spent servicing and handling software interrupts.
+
+==== cpu.softirq_p
+
+type: float
+
+The percentage of CPU time spent servicing and handling software interrupts.
+
+==== cpu.steal
+
+type: long
+
+The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+==== cpu.steal_p
+
+type: float
+
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+[float]
+=== mem Fields
+
+This group contains statistics related to the memory usage on the system.
+
+
+==== mem.total
+
+type: long
+
+Total memory.
+
+
+==== mem.used
+
+type: long
+
+Used memory.
+
+
+==== mem.free
+
+type: long
+
+Available memory.
+
+
+==== mem.used_p
+
+type: float
+
+The percentage of used memory.
+
+
+==== mem.actual_used
+
+type: long
+
+Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
+
+
+==== mem.actual_free
+
+type: long
+
+Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
+
+
+==== mem.actual_used_p
+
+type: float
+
+The percentage of actual used memory.
+
+
+[float]
+=== swap Fields
+
+This group contains statistics related to the swap memory usage on the system.
+
+
+==== swap.total
+
+type: long
+
+Total swap memory.
+
+
+==== swap.used
+
+type: long
+
+Used swap memory.
+
+
+==== swap.free
+
+type: long
+
+Available swap memory.
+
+
+==== swap.used_p
+
+type: float
+
+The percentage of used swap memory.
 
 

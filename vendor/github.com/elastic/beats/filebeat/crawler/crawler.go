@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -28,7 +28,7 @@ type Crawler struct {
 	wg          sync.WaitGroup
 }
 
-func (c *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan chan *input.FileEvent) error {
+func (c *Crawler) Start(prospectorConfigs []*common.Config, eventChan chan *input.FileEvent) error {
 
 	if len(prospectorConfigs) == 0 {
 		return fmt.Errorf("No prospectors defined. You must have at least one prospector defined in the config file.")
@@ -36,12 +36,13 @@ func (c *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan c
 
 	logp.Info("Loading Prospectors: %v", len(prospectorConfigs))
 
+	// Get existing states
+	states := *c.Registrar.state
+
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, prospectorConfig := range prospectorConfigs {
 
-		logp.Debug("prospector", "File Configs: %v", prospectorConfig.Paths)
-
-		prospector, err := NewProspector(prospectorConfig, c.Registrar, eventChan)
+		prospector, err := NewProspector(prospectorConfig, states, eventChan)
 		if err != nil {
 			return fmt.Errorf("Error in initing prospector: %s", err)
 		}
@@ -51,12 +52,20 @@ func (c *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan c
 	logp.Info("Loading Prospectors completed. Number of prospectors: %v", len(c.prospectors))
 
 	c.wg = sync.WaitGroup{}
-	for _, prospector := range c.prospectors {
+	for i, p := range c.prospectors {
 		c.wg.Add(1)
-		go prospector.Run(&c.wg)
+
+		go func(id int, prospector *Prospector) {
+			defer func() {
+				c.wg.Done()
+				logp.Debug("crawler", "Prospector %v stopped", id)
+			}()
+			logp.Debug("crawler", "Starting prospector %v", id)
+			prospector.Run()
+		}(i, p)
 	}
 
-	logp.Info("All prospectors are initialised and running with %d states to persist", len(c.Registrar.getState()))
+	logp.Info("All prospectors are initialised and running with %d states to persist", c.Registrar.state.Count())
 
 	return nil
 }
@@ -66,7 +75,9 @@ func (c *Crawler) Stop() {
 
 	logp.Info("Stopping %v prospectors", len(c.prospectors))
 	for _, prospector := range c.prospectors {
-		prospector.Stop()
+		// Stop prospectors in parallel
+		c.wg.Add(1)
+		go prospector.Stop(&c.wg)
 	}
 	c.wg.Wait()
 	logp.Info("Crawler stopped")

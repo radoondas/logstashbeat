@@ -31,6 +31,8 @@ deps:
 .PHONY: xgo-image
 xgo-image:
 	cd $(packer_absdir)/docker/xgo-image/; ./build.sh
+	# copy build.sh script in the xgo-image-deb6 to avoid code duplication
+	cp $(packer_absdir)/docker/xgo-image/base/build.sh $(packer_absdir)/docker/xgo-image-deb6/base/build.sh
 	cd $(packer_absdir)/docker/xgo-image-deb6/; ./build.sh
 
 .PHONY: fpm-image
@@ -42,7 +44,7 @@ go-daemon-image:
 	docker build --rm=true -t tudorg/go-daemon $(packer_absdir)/docker/go-daemon/
 
 build/god-linux-386 build/god-linux-amd64:
-	docker run -v $(shell pwd)/build:/build tudorg/go-daemon
+	docker run --rm -v $(shell pwd)/build:/build tudorg/go-daemon
 
 build/upload:
 	mkdir -p build/upload
@@ -70,11 +72,19 @@ package-upload:
 release-upload:
 	aws s3 cp --recursive --acl public-read build/upload s3://download.elasticsearch.org/beats/
 
-.PHONY: run-interactive
-run-interactive:
+.PHONY: run-interactive-builder-deb6
+run-interactive-builder-deb6:
 	docker run -t -i -v $(shell pwd)/build:/build \
 		-v $(shell pwd)/xgo-scripts/:/scripts \
+		-v $(shell pwd)/../..:/source \
 		--entrypoint=bash tudorg/beats-builder-deb6
+
+.PHONY: run-interactive-builder
+run-interactive-builder:
+	docker run -t -i -v $(shell pwd)/build:/build \
+		-v $(packer_absdir)/xgo-scripts/:/scripts \
+		-v $(shell pwd)/../..:/source \
+		--entrypoint=bash tudorg/beats-builder
 
 .PHONY: images
 images: xgo-image fpm-image go-daemon-image

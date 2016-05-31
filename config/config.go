@@ -8,5 +8,11 @@ type Config struct {
 }
 
 type LogstashbeatConfig struct {
-	Period string `config:"period"`
+	Period string   `config:"period"`
+	URLs   []string `yaml:"urls"`
+	Node   struct {
+		Events  *bool
+		Jvm     *bool
+		Process *bool
+	}
 }

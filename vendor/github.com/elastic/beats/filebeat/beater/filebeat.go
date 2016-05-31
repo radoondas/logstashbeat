@@ -71,7 +71,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Load the previous log file locations now, for use in prospector
-	fb.registrar.LoadState()
+	err = fb.registrar.LoadState()
+	if err != nil {
+		logp.Err("Error loading state: %v", err)
+		return err
+	}
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
 	fb.spooler = NewSpooler(fb.FbConfig.Filebeat, fb.publisherChan)
@@ -81,11 +85,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	// Start up spooler
+	fb.registrar.Start()
 	fb.spooler.Start()
-
-	// registrar records last acknowledged positions in all files.
-	go fb.registrar.Run()
 
 	err = fb.crawler.Start(fb.FbConfig.Filebeat.Prospectors, fb.spooler.Channel)
 	if err != nil {
@@ -98,9 +99,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	fb.pub.Start()
 
 	// Blocks progressing
-	select {
-	case <-fb.done:
-	}
+	<-fb.done
 
 	return nil
 }
@@ -114,6 +113,7 @@ func (fb *Filebeat) Cleanup(b *beat.Beat) error {
 func (fb *Filebeat) Stop() {
 
 	logp.Info("Stopping filebeat")
+
 	// Stop crawler -> stop prospectors -> stop harvesters
 	fb.crawler.Stop()
 

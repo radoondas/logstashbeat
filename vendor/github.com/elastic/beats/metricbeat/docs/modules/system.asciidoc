@@ -56,11 +56,34 @@ here (add link). Below is an example of a configuration option:
 ----
 metricbeat.modules:
 - module: system
-  metricsets: ["cpu", "core", "filesystem", "fsstat", "memory", "process"]
+  metricsets:
+    # CPU stats
+    - cpu
+
+    # Per CPU core stats
+    #- core
+
+    # IO stats
+    #- diskio
+
+    # Per filesystem stats
+    - filesystem
+
+    # File system summary stats
+    #- fsstat
+
+    # Memory stats
+    - memory
+
+    # Network stats
+    - network
+
+    # Per process stats
+    - process
   enabled: true
-  period: 2s
+  period: 10s
   processes: ['.*']
-  
+
   # if true, exports the CPU usage in ticks, together with the percentage values
   cpu_ticks: false
 ----
@@ -74,7 +97,7 @@ The following MetricSets are available:
 
 * <<metricbeat-metricset-system-cpu,cpu>>
 
-* <<metricbeat-metricset-system-disk,disk>>
+* <<metricbeat-metricset-system-diskio,diskio>>
 
 * <<metricbeat-metricset-system-filesystem,filesystem>>
 
@@ -90,7 +113,7 @@ include::system/core.asciidoc[]
 
 include::system/cpu.asciidoc[]
 
-include::system/disk.asciidoc[]
+include::system/diskio.asciidoc[]
 
 include::system/filesystem.asciidoc[]
 

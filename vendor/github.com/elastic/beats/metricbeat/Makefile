@@ -44,6 +44,7 @@ configs:
 # Generates imports for all modules and metricsets
 .PHONY: imports
 imports:
+	mkdir -p include
 	python ${ES_BEATS}/metricbeat/scripts/generate_imports.py > include/list.go
 
 # This is called by the beats packer before building starts
@@ -58,3 +59,8 @@ collect: fields docs configs update imports
 .PHONY: create-metricset
 create-metricset:
 	python ${ES_BEATS}/metricbeat/scripts/create_metricset.py $(MODULE) $(METRICSET)
+
+# Generates the data.json example documents
+.PHONY: generate-json
+generate-json:
+	go test github.com/elastic/beats/metricbeat/module/... -data

@@ -1,0 +1,15 @@
+################### Logstashbeat Configuration Example #########################
+
+############################# Logstashbeat ######################################
+
+logstashbeat:
+  # Defines how often an event is sent to the output
+  period: 5s
+
+  urls: ["http://127.0.0.1:9600"]
+
+  node:
+    events: true
+    jvm: true
+    process: true
+

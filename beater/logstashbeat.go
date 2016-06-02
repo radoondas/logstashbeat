@@ -173,7 +173,24 @@ func (bt *Logstashbeat) Run(b *beat.Beat) error {
 					}
 				}
 
-				//if bt.Node.process {}
+				if bt.Node.process {
+					logp.Debug(selector, "Node/stats/process for url: %v", u)
+					process, err := bt.GetNodeStatsProcess(*u)
+					if err != nil {
+						logp.Err("Error reading Node/stats/process metrics: %v", err)
+					} else {
+						logp.Debug(selectorDetail, "Node/stats/process metrics detail: %+v", process)
+
+						event := common.MapStr{
+							"@timestamp": common.Time(time.Now()),
+							"type":       "nodeStats",
+							"url":        u.String(),
+							"process":    process,
+						}
+						logp.Debug(selectorDetail, "Published Process detail: %+v", event)
+						bt.client.PublishEvent(event)
+					}
+				}
 
 				timerEnd := time.Now()
 				duration := timerEnd.Sub(timerStart)

@@ -11,5 +11,5 @@ logstashbeat:
   node:
     events: true
     jvm: true
-    process: false
+    process: true
 

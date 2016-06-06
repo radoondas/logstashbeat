@@ -2,7 +2,7 @@
 
 **Note: This is development version**
 
-**Note: Beat works only with Logstash v5**
+**Note: Beat works only with Logstash 5.0aplha3**
 
 Welcome to Logstashbeat which queries metrics from Logstash and index them in Elasticsearch.
 

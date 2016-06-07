@@ -147,7 +147,7 @@ func (bt *Logstashbeat) Run(b *beat.Beat) error {
 							"@timestamp": common.Time(time.Now()),
 							"type":       "nodeStats",
 							"url":        u.String(),
-							"jvm":        jvm,
+							"jvm":        jvm.JVM,
 						}
 						logp.Debug(selectorDetail, "Published Event detail: %+v", event)
 						bt.client.PublishEvent(event)
@@ -156,17 +156,17 @@ func (bt *Logstashbeat) Run(b *beat.Beat) error {
 
 				if bt.Node.events {
 					logp.Debug(selector, "Node/stats/events for url: %v", u)
-					ev, err := bt.GetNodeStatsEvents(*u)
+					e, err := bt.GetNodeStatsEvents(*u)
 					if err != nil {
 						logp.Err("Error reading Node/stats/events metrics: %v", err)
 					} else {
-						logp.Debug(selectorDetail, "Node/stats/events metrics detail: %+v", ev)
+						logp.Debug(selectorDetail, "Node/stats/events metrics detail: %+v", e)
 
 						event := common.MapStr{
 							"@timestamp": common.Time(time.Now()),
 							"type":       "nodeStats",
 							"url":        u.String(),
-							"events":     ev,
+							"events":     e.Events,
 						}
 						logp.Debug(selectorDetail, "Published Event detail: %+v", event)
 						bt.client.PublishEvent(event)
@@ -175,17 +175,17 @@ func (bt *Logstashbeat) Run(b *beat.Beat) error {
 
 				if bt.Node.process {
 					logp.Debug(selector, "Node/stats/process for url: %v", u)
-					process, err := bt.GetNodeStatsProcess(*u)
+					p, err := bt.GetNodeStatsProcess(*u)
 					if err != nil {
 						logp.Err("Error reading Node/stats/process metrics: %v", err)
 					} else {
-						logp.Debug(selectorDetail, "Node/stats/process metrics detail: %+v", process)
+						logp.Debug(selectorDetail, "Node/stats/process metrics detail: %+v", p)
 
 						event := common.MapStr{
 							"@timestamp": common.Time(time.Now()),
 							"type":       "nodeStats",
 							"url":        u.String(),
-							"process":    process,
+							"process":    p.Process,
 						}
 						logp.Debug(selectorDetail, "Published Process detail: %+v", event)
 						bt.client.PublishEvent(event)

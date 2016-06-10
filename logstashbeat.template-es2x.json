@@ -37,6 +37,63 @@
             }
           }
         },
+        "events": {
+          "properties": {
+            "filter": {
+              "type": "long"
+            },
+            "in": {
+              "type": "long"
+            },
+            "out": {
+              "type": "long"
+            }
+          }
+        },
+        "jvm": {
+          "properties": {
+            "threads": {
+              "properties": {
+                "count": {
+                  "type": "long"
+                },
+                "peak_count": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        },
+        "process": {
+          "properties": {
+            "cpu": {
+              "properties": {
+                "percent": {
+                  "type": "long"
+                },
+                "total_in_millis": {
+                  "type": "long"
+                }
+              }
+            },
+            "max_file_descriptors": {
+              "type": "integer"
+            },
+            "mem": {
+              "properties": {
+                "total_virtual_in_bytes": {
+                  "type": "float"
+                }
+              }
+            },
+            "open_file_descriptors": {
+              "type": "integer"
+            },
+            "peak_open_file_descriptors": {
+              "type": "integer"
+            }
+          }
+        },
         "tags": {
           "ignore_above": 1024,
           "index": "not_analyzed",

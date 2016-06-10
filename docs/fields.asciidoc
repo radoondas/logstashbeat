@@ -10,6 +10,7 @@ This document describes the fields that are exported by Logstashbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-beat>>
+* <<exported-fields-logstashbeat>>
 
 [[exported-fields-beat]]
 === Beat Fields
@@ -51,5 +52,131 @@ Arbitrary tags that can be set per Beat and per transaction type.
 type: dict
 
 Contains user configurable fields.
+
+
+[[exported-fields-logstashbeat]]
+=== Logstashbeat Fields
+
+Logstashbeat fields.
+
+
+
+[float]
+=== events Fields
+
+Contains events metrics.
+
+
+
+==== events.in
+
+type: long
+
+Number of events just accepted.
+
+
+==== events.out
+
+type: long
+
+Number of currently processed events.
+
+
+==== events.filter
+
+type: long
+
+Number of currently filtered events.
+
+
+[float]
+=== jvm Fields
+
+Contains fields available for JVM
+
+
+
+[float]
+=== threads Fields
+
+Contains fields available for JVM
+
+
+
+==== jvm.threads.count
+
+type: long
+
+Threads count.
+
+
+==== jvm.threads.peak_count
+
+type: long
+
+Peak count threads.
+
+
+[float]
+=== process Fields
+
+Contains fields process metrics.
+
+
+
+==== process.max_file_descriptors
+
+type: integer
+
+Maximum file descriptors.
+
+
+==== process.open_file_descriptors
+
+type: integer
+
+Open file descriptors.
+
+
+==== process.peak_open_file_descriptors
+
+type: integer
+
+Peak open file descriptors.
+
+
+[float]
+=== cpu Fields
+
+Contains CPU statistics
+
+
+
+==== process.cpu.percent
+
+type: long
+
+CPU percent.
+
+
+==== process.cpu.total_in_millis
+
+type: long
+
+CPU total time in miliseconds.
+
+
+[float]
+=== mem Fields
+
+Contains memory metrics.
+
+
+
+==== process.mem.total_virtual_in_bytes
+
+type: float
+
+Total virtual memory in bytes.
 
 

@@ -1,46 +1,79 @@
-defaults:
-  type: keyword
-  required: false
-  index: true
-
-env:
-  type: group
+- key: logstashbeat
+  title: Logstashbeat
   description: >
-    Contains common fields available in all event types.
+    Logstashbeat fields.
   fields:
-    - type: group
-      name: beat
-      fields:
-      - name: name
+      - name: events
+        type: group
         description: >
-          The name of the Beat sending the log messages. If the shipper name is set
-          in the configuration file, then that value is used. If it is not set,
-          the hostname is used.
-      - name: hostname
+          Contains events metrics.
+        fields:
+          - name: in
+            type: long
+            description: >
+              Number of events just accepted.
+          - name: out
+            type: long
+            description: >
+              Number of currently processed events.
+          - name: filter
+            type: long
+            description: >
+              Number of currently filtered events.
+      - name: jvm
+        type: group
         description: >
-          The hostname as returned by the operating system on which the Beat is
-          running.
-    - name: "@timestamp"
-      type: date
-      required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
-      description: >
-        The timestamp when the log line was read. The precision is in
-        milliseconds. The timezone is UTC.
-    - name: type
-      required: true
-      description: >
-        PLEASE UPDATE DOCUMENTATION
-
-logstashbeat:
-  fields:
-    - name: counter
-      type: integer
-      required: true
-      description: >
-        PLEASE UPDATE DOCUMENTATION
-
-sections:
-  - ["env", "Common"]
-  - ["logstashbeat", "Logstashbeat"]
+          Contains fields available for JVM
+        fields:
+          - name: threads
+            type: group
+            description: >
+              Contains fields available for JVM
+            fields:
+              - name: count
+                type: long
+                description: >
+                  Threads count.
+              - name: peak_count
+                type: long
+                description: >
+                  Peak count threads.
+      - name: process
+        type: group
+        description: >
+          Contains fields process metrics.
+        fields:
+          - name: max_file_descriptors
+            type: integer
+            description: >
+              Maximum file descriptors.
+          - name: open_file_descriptors
+            type: integer
+            description: >
+              Open file descriptors.
+          - name: peak_open_file_descriptors
+            type: integer
+            description: >
+              Peak open file descriptors.
+          - name: cpu
+            type: group
+            description: >
+              Contains CPU statistics
+            fields:
+              - name: percent
+                type: long
+                description: >
+                  CPU percent.
+              - name: total_in_millis
+                type: long
+                description: >
+                  CPU total time in miliseconds.
+          - name: mem
+            type: group
+            description: >
+              Contains memory metrics.
+            fields:
+              - name: total_virtual_in_bytes
+                type: float
+                description: >
+                  Total virtual memory in bytes.

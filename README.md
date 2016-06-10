@@ -1,5 +1,7 @@
 # Logstashbeat
 
+**There is another [logstashbeat](https://github.com/consulthys/logstashbeat) which was developed in parallel without any knowledge of each other. I worked on this one for personal purposes. I do not want to compete but I don't want to delete it as well. :)**
+
 **Note: This is development version**
 
 **Note: Beat works only with Logstash 5.0aplha3**

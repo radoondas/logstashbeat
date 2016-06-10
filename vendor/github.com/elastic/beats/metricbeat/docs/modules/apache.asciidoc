@@ -8,13 +8,18 @@ This file is generated! See scripts/docs_collector.py
 This module periodically fetches metrics from https://httpd.apache.org/[Apache
 HTTPD] servers.
 
+[float]
+=== Compatibility
+
+The apache MetricSets were tested with apache 2.4.20 and are expected to work with all version
+>= 2.2.31 and >= 2.4.16.
 
 
 [float]
 === Example Configuration
 
 The Apache module supports the standard configuration options which can be found
-here (add link). Below is an example of a configuration option:
+here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
 
 [source,yaml]
 ----
@@ -25,7 +30,7 @@ metricbeat.modules:
   period: 10s
 
   # Apache hosts
-  hosts: ["http://127.0.0.1/"]
+  hosts: ["http://127.0.0.1"]
 ----
 
 [float]

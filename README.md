@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/radoondas/logstashbeat.svg?branch=master)](https://travis-ci.org/radoondas/logstashbeat)
+[![GoReportCard](https://goreportcard.com/badge/github.com/radoondas/logstashbeat)](https://goreportcard.com/report/github.com/radoondas/logstashbeat)
+
 # Logstashbeat
 
 **There is another [logstashbeat](https://github.com/consulthys/logstashbeat) which was developed in parallel without any knowledge of each other. I worked on this one for personal purposes. I do not want to compete but I don't want to delete it as well. :)**

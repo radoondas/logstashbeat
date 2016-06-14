@@ -1,0 +1,2 @@
+// +build !integration
+package beater

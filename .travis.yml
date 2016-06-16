@@ -31,7 +31,7 @@ before_install:
   - mkdir -p $HOME/gopath/src/github.com/radoondas/logstashbeat/
   - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/radoondas/logstashbeat/
   - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/radoondas/logstashbeat/
-  - cd $HOME/gopath/src/github.com/radoondas/logstashbeat/
+  - cd $HOME/gopath/src/github.com/radoondas/
 
 install:
   - true

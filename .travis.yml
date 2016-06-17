@@ -15,7 +15,7 @@ os:
 env:
   matrix:
     - TARGETS="check"
-    - TARGETS="-C logstashbeat testsuite"
+    - TARGETS="testsuite"
 
   global:
     # Cross-compile for amd64 only to speed up testing.
@@ -31,7 +31,7 @@ before_install:
   - mkdir -p $HOME/gopath/src/github.com/radoondas/logstashbeat/
   - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/radoondas/logstashbeat/
   - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/radoondas/logstashbeat/
-  - cd $HOME/gopath/src/github.com/radoondas/
+  - cd $HOME/gopath/src/github.com/radoondas/logstashbeat/
 
 install:
   - true

@@ -61,6 +61,17 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
+#--------------------------- MongoDB Status Module ---------------------------
+- module: mongodb
+  metricsets: ["status"]
+  enabled: true
+  period: 10s
+
+  # The hosts must be passed as MongoDB URLs in the format:
+  # [mongodb://][user:pass@]host[:port]
+  hosts: ["localhost:27017"]
+
+
 #---------------------------- MySQL Status Module ----------------------------
 #- module: mysql
   #metricsets: ["status"]
@@ -216,6 +227,9 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
+
+  # Set gzip compression level.
+  #compression_level: 0
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"

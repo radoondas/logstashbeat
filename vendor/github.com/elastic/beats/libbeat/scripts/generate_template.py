@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-This script generates the ES template file (topbeat.template.json) from
+This script generates the ES template file (packetbeat.template.json) from
 the etc/fields.yml file.
 
 Example usage:
@@ -276,7 +276,7 @@ if __name__ == "__main__":
         fields = f.read()
 
         # Prepend beat fields from libbeat
-        with open(args.es_beats + "/libbeat/_beat/fields.yml") as f:
+        with open(args.es_beats + "/libbeat/_meta/fields.yml") as f:
             fields = f.read() + fields
 
         with open(target, 'w') as output:

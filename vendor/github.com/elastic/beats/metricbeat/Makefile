@@ -20,18 +20,18 @@ include ${ES_BEATS}/libbeat/scripts/Makefile
 kibana:
 	-rm -r etc/kibana
 	mkdir -p etc/kibana
-	-cp -r module/*/_beat/kibana/ etc/kibana
+	-cp -r module/*/_meta/kibana/ etc/kibana
 
 # Collects all module and metricset fields
 .PHONY: fields
 fields:
 	mkdir -p etc/
-	cat ${ES_BEATS}/metricbeat/etc/_beat/fields_base.yml > etc/fields.yml
+	cat ${ES_BEATS}/metricbeat/etc/_meta/fields_base.yml > etc/fields.yml
 	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> etc/fields.yml
 
 # Collects all module docs
-.PHONY: docs
-docs: python-env
+.PHONY: collect-docs
+collect-docs: python-env
 	-rm -r docs/modules
 	mkdir -p docs/modules
 	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/docs_collector.py
@@ -54,7 +54,7 @@ before-build:
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields docs configs update imports
+collect: fields collect-docs configs update imports kibana
 
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset

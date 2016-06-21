@@ -221,9 +221,9 @@ update: python-env
 	# Update config
 	echo "Update config file"
 	-rm -f etc/${BEATNAME}.yml
-	cat etc/beat.yml ${ES_BEATS}/libbeat/_beat/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
+	cat etc/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
 	-rm -f etc/${BEATNAME}.full.yml
-	cat etc/beat.full.yml ${ES_BEATS}/libbeat/_beat/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
+	cat etc/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
 
 	# Update fields
 	echo "Update fields"
@@ -233,6 +233,18 @@ update: python-env
 	# Update templates
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME} ${ES_BEATS}
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME} ${ES_BEATS}
+
+# Builds the documents for the beat
+.PHONY: docs
+docs:
+	sh ${ES_BEATS}/libbeat/scripts/build_docs.sh ${BEATNAME}
+
+# Preview the documents for the beat in the browser
+.PHONY: docs-preview
+docs-preview:
+	if [ ! -d "build/docs" ]; then $(MAKE) docs; fi;
+	${BUILD_DIR}/docs/build_docs.pl --chunk=1 --web -open chunk=1 -open --doc ${GOPATH}/src/github.com/elastic/beats/${BEATNAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
+
 
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200
@@ -261,8 +273,7 @@ start-environment: stop-environment
 .PHONY: stop-environment
 stop-environment:
 	-${DOCKER_COMPOSE} stop
-	-${DOCKER_COMPOSE} rm -f
-	-docker ps -a  | grep ${BEATNAME} | grep Exited | awk '{print $$1}' | xargs docker rm
+	-${DOCKER_COMPOSE} rm -f -v -a
 
 .PHONY: write-environment
 write-environment:
@@ -271,7 +282,6 @@ write-environment:
 	echo "ES_PORT=9200" >> ${BUILD_DIR}/test.env
 	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env
-
 
 ### Packaging targets ####
 

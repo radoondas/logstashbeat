@@ -25,8 +25,8 @@
 # dictionaries.
 #
 # The supported keys are name (required), tags, fields, fields_under_root,
-# ignore_older, level, event_id, provider, and include_xml. Please visit the
-# documentation for the complete details of each option.
+# forwarded, ignore_older, level, event_id, provider, and include_xml. Please
+# visit the documentation for the complete details of each option.
 # https://go.es.io/WinlogbeatConfig
 winlogbeat.event_logs:
   - name: Application
@@ -117,6 +117,9 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
+
+  # Set gzip compression level.
+  #compression_level: 0
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"

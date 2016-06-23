@@ -4,32 +4,39 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported Fields
+= Exported Fields
 
+[partintro]
+
+--
 This document describes the fields that are exported by Logstashbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-beat>>
 * <<exported-fields-logstashbeat>>
 
+--
 [[exported-fields-beat]]
-=== Beat Fields
+== Beat Fields
 
 Contains common beat fields available in all event types.
 
 
 
-==== beat.name
+[float]
+=== beat.name
 
 The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
 
 
-==== beat.hostname
+[float]
+=== beat.hostname
 
 The hostname as returned by the operating system on which the Beat is running.
 
 
-==== @timestamp
+[float]
+=== @timestamp
 
 type: date
 
@@ -42,12 +49,14 @@ required: True
 The timestamp when the event log record was generated.
 
 
-==== tags
+[float]
+=== tags
 
 Arbitrary tags that can be set per Beat and per transaction type.
 
 
-==== fields
+[float]
+=== fields
 
 type: dict
 
@@ -55,34 +64,37 @@ Contains user configurable fields.
 
 
 [[exported-fields-logstashbeat]]
-=== Logstashbeat Fields
+== Logstashbeat Fields
 
 Logstashbeat fields.
 
 
 
 [float]
-=== events Fields
+== events Fields
 
 Contains events metrics.
 
 
 
-==== events.in
+[float]
+=== events.in
 
 type: long
 
 Number of events just accepted.
 
 
-==== events.out
+[float]
+=== events.out
 
 type: long
 
 Number of currently processed events.
 
 
-==== events.filter
+[float]
+=== events.filter
 
 type: long
 
@@ -90,27 +102,29 @@ Number of currently filtered events.
 
 
 [float]
-=== jvm Fields
+== jvm Fields
 
 Contains fields available for JVM
 
 
 
 [float]
-=== threads Fields
+== threads Fields
 
 Contains fields available for JVM
 
 
 
-==== jvm.threads.count
+[float]
+=== jvm.threads.count
 
 type: long
 
 Threads count.
 
 
-==== jvm.threads.peak_count
+[float]
+=== jvm.threads.peak_count
 
 type: long
 
@@ -118,27 +132,30 @@ Peak count threads.
 
 
 [float]
-=== process Fields
+== process Fields
 
 Contains fields process metrics.
 
 
 
-==== process.max_file_descriptors
+[float]
+=== process.max_file_descriptors
 
 type: integer
 
 Maximum file descriptors.
 
 
-==== process.open_file_descriptors
+[float]
+=== process.open_file_descriptors
 
 type: integer
 
 Open file descriptors.
 
 
-==== process.peak_open_file_descriptors
+[float]
+=== process.peak_open_file_descriptors
 
 type: integer
 
@@ -146,20 +163,22 @@ Peak open file descriptors.
 
 
 [float]
-=== cpu Fields
+== cpu Fields
 
 Contains CPU statistics
 
 
 
-==== process.cpu.percent
+[float]
+=== process.cpu.percent
 
 type: long
 
 CPU percent.
 
 
-==== process.cpu.total_in_millis
+[float]
+=== process.cpu.total_in_millis
 
 type: long
 
@@ -167,13 +186,14 @@ CPU total time in miliseconds.
 
 
 [float]
-=== mem Fields
+== mem Fields
 
 Contains memory metrics.
 
 
 
-==== process.mem.total_virtual_in_bytes
+[float]
+=== process.mem.total_virtual_in_bytes
 
 type: float
 

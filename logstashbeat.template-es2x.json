@@ -77,7 +77,7 @@
               }
             },
             "max_file_descriptors": {
-              "type": "integer"
+              "type": "long"
             },
             "mem": {
               "properties": {
@@ -87,10 +87,10 @@
               }
             },
             "open_file_descriptors": {
-              "type": "integer"
+              "type": "long"
             },
             "peak_open_file_descriptors": {
-              "type": "integer"
+              "type": "long"
             }
           }
         },

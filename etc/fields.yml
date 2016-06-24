@@ -3,77 +3,77 @@
   description: >
     Logstashbeat fields.
   fields:
-      - name: events
-        type: group
-        description: >
-          Contains events metrics.
-        fields:
-          - name: in
-            type: long
-            description: >
-              Number of events just accepted.
-          - name: out
-            type: long
-            description: >
-              Number of currently processed events.
-          - name: filter
-            type: long
-            description: >
-              Number of currently filtered events.
-      - name: jvm
-        type: group
-        description: >
-          Contains fields available for JVM
-        fields:
-          - name: threads
-            type: group
-            description: >
-              Contains fields available for JVM
-            fields:
-              - name: count
-                type: long
-                description: >
-                  Threads count.
-              - name: peak_count
-                type: long
-                description: >
-                  Peak count threads.
-      - name: process
-        type: group
-        description: >
-          Contains fields process metrics.
-        fields:
-          - name: max_file_descriptors
-            type: integer
-            description: >
-              Maximum file descriptors.
-          - name: open_file_descriptors
-            type: integer
-            description: >
-              Open file descriptors.
-          - name: peak_open_file_descriptors
-            type: integer
-            description: >
-              Peak open file descriptors.
-          - name: cpu
-            type: group
-            description: >
-              Contains CPU statistics
-            fields:
-              - name: percent
-                type: long
-                description: >
-                  CPU percent.
-              - name: total_in_millis
-                type: long
-                description: >
-                  CPU total time in miliseconds.
-          - name: mem
-            type: group
-            description: >
-              Contains memory metrics.
-            fields:
-              - name: total_virtual_in_bytes
-                type: float
-                description: >
-                  Total virtual memory in bytes.
+    - name: events
+      type: group
+      description: >
+        Contains events metrics.
+      fields:
+        - name: in
+          type: long
+          description: >
+            Number of events just accepted.
+        - name: out
+          type: long
+          description: >
+            Number of currently processed events.
+        - name: filter
+          type: long
+          description: >
+            Number of currently filtered events.
+    - name: jvm
+      type: group
+      description: >
+        Contains fields available for JVM
+      fields:
+        - name: threads
+          type: group
+          description: >
+            Contains fields available for JVM
+          fields:
+            - name: count
+              type: long
+              description: >
+                Threads count.
+            - name: peak_count
+              type: long
+              description: >
+                Peak count threads.
+    - name: process
+      type: group
+      description: >
+        Contains fields process metrics.
+      fields:
+        - name: max_file_descriptors
+          type: integer
+          description: >
+            Maximum file descriptors.
+        - name: open_file_descriptors
+          type: integer
+          description: >
+            Open file descriptors.
+        - name: peak_open_file_descriptors
+          type: integer
+          description: >
+            Peak open file descriptors.
+        - name: cpu
+          type: group
+          description: >
+            Contains CPU statistics
+          fields:
+            - name: percent
+              type: long
+              description: >
+                CPU percent.
+            - name: total_in_millis
+              type: long
+              description: >
+                CPU total time in miliseconds.
+        - name: mem
+          type: group
+          description: >
+            Contains memory metrics.
+          fields:
+            - name: total_virtual_in_bytes
+              type: float
+              description: >
+                Total virtual memory in bytes.

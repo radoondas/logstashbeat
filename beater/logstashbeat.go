@@ -256,7 +256,6 @@ func (bt *Logstashbeat) Run(b *beat.Beat) error {
 					}
 				}
 
-
 				if bt.Node.jvm {
 					logp.Debug(selector, "Node/jvm for url: %v", u)
 					j, err := bt.GetNodeJVM(*u)

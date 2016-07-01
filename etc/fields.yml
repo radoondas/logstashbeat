@@ -77,3 +77,159 @@
               type: float
               description: >
                 Total virtual memory in bytes.
+    - name: mem
+      type: group
+      description: >
+        Contains fields memory metrics.
+      fields:
+        - name: heap_used_in_bytes
+          type: long
+          description: >
+            Heap used in bytes.
+        - name: heap_used_percent
+          type: integer
+          description: >
+            Heap used in percent.
+        - name: heap_committed_in_bytes
+          type: long
+          description: >
+            Heap committed in bytes.
+        - name: heap_max_in_bytes
+          type: long
+          description: >
+            Heap max in bytes.
+        - name: non_heap_used_in_bytes
+          type: long
+          description: >
+            Non heap used in bytes.
+        - name: non_heap_committed_in_bytes
+          type: long
+          description: >
+            Non heap committed in bytes.
+        - name: pools
+          type: group
+          description: >
+            Contains Memory Pool statistics
+          fields:
+            - name: survivor
+              type: group
+              description: >
+                Contains Survivor statistics
+              fields:
+                - name: peak_used_in_bytes
+                  type: long
+                  description: >
+                    Peak used in bytes.
+                - name: used_in_bytes
+                  type: long
+                  description: >
+                    Used in bytes.
+                - name: peak_max_in_bytes
+                  type: long
+                  description: >
+                    Peak max in bytes.
+                - name: max_in_bytes
+                  type: long
+                  description: >
+                    Max in bytes.
+                - name: committed_in_bytes
+                  type: long
+                  description: >
+                    Committed in bytes.
+            - name: old
+              type: group
+              description: >
+                Contains Old statistics
+              fields:
+                - name: peak_used_in_bytes
+                  type: long
+                  description: >
+                    Peak used in bytes.
+                - name: used_in_bytes
+                  type: long
+                  description: >
+                    Used in bytes.
+                - name: peak_max_in_bytes
+                  type: long
+                  description: >
+                    Peak max in bytes.
+                - name: max_in_bytes
+                  type: long
+                  description: >
+                    Max in bytes.
+                - name: committed_in_bytes
+                  type: long
+                  description: >
+                    Committed in bytes.
+            - name: young
+              type: group
+              description: >
+                Contains Young statistics
+              fields:
+                - name: peak_used_in_bytes
+                  type: long
+                  description: >
+                    Peak used in bytes.
+                - name: used_in_bytes
+                  type: long
+                  description: >
+                    Used in bytes.
+                - name: peak_max_in_bytes
+                  type: long
+                  description: >
+                    Peak max in bytes.
+                - name: max_in_bytes
+                  type: long
+                  description: >
+                    Max in bytes.
+                - name: committed_in_bytes
+                  type: long
+                  description: >
+                    Committed in bytes.
+    - name: pipeline
+      type: group
+      description: >
+        Contains pipeline metrics.
+      fields:
+        - name: workers
+          type: integer
+          description: >
+            Number of workers.
+        - name: batch_size
+          type: integer
+          description: >
+            Batch size.
+        - name: batch_delay
+          type: integer
+          description: >
+            Batch delay.
+    - name: jvm
+      type: group
+      description: >
+        Contains jvm metrics.
+      fields:
+        - name: start_time_in_millis
+          type: long
+          description: >
+            Start time in millis.
+        - name: mem
+          type: group
+          description: >
+            Contains jvm mem metrics.
+          fields:
+            - name: heap_init_in_bytes
+              type: long
+              description: >
+                Heap init in bytes.
+            - name: heap_max_in_bytes
+              type: long
+              description: >
+                Heap max in bytes.
+            - name: non_heap_init_in_bytes
+              type: long
+              description: >
+                Non heap init in bytes.
+            - name: non_heap_max_in_bytes
+              type: long
+              description: >
+                Non heap max in bytes.

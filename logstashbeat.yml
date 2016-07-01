@@ -9,11 +9,14 @@ logstashbeat:
   urls: ["http://127.0.0.1:9600"]
 
   node:
-    events: true
+    stats:
+      events: true
+      jvm: true
+      process: true
+      mem: true
+    pipeline: true
     jvm: true
-    process: true
-
-
+  
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group

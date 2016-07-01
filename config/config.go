@@ -11,8 +11,13 @@ type LogstashbeatConfig struct {
 	Period string   `config:"period"`
 	URLs   []string `yaml:"urls"`
 	Node   struct {
-		Events  *bool `json:"events"`
-		Jvm     *bool `json:"jvm"`
-		Process *bool `json:"process"`
-	}
+		Stats struct {
+			Events  *bool `json:"events"`
+			Jvm     *bool `json:"jvm"`
+			Process *bool `json:"process"`
+			Mem     *bool `json:"mem"`
+		} `json:"stats"`
+		Pipeline *bool `json:"pipeline"`
+		Jvm      *bool `json:"jvm"`
+	} `json:"node"`
 }

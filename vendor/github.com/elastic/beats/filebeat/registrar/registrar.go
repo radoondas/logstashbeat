@@ -41,11 +41,6 @@ func New(registryFile string) (*Registrar, error) {
 // Init sets up the Registrar and make sure the registry file is setup correctly
 func (r *Registrar) Init() error {
 
-	// Set to default in case it is not set
-	if r.registryFile == "" {
-		r.registryFile = cfg.DefaultRegistryFile
-	}
-
 	// The registry file is opened in the data path
 	r.registryFile = paths.Resolve(paths.Data, r.registryFile)
 
@@ -137,8 +132,8 @@ func (r *Registrar) loadAndConvertOldState(f *os.File) bool {
 	logp.Info("Old registry states found: %v", len(oldStates))
 	counter := 0
 	for _, state := range oldStates {
-		// Makes time last_seen time of migration, as this is the best guess
-		state.LastSeen = time.Now()
+		// Makes timestamp time of migration, as this is the best guess
+		state.Timestamp = time.Now()
 		states[counter] = state
 		counter++
 	}
@@ -185,8 +180,10 @@ func (r *Registrar) Run() {
 			r.processEventStates(events)
 		}
 
-		if e := r.writeRegistry(); e != nil {
-			logp.Err("Writing of registry returned error: %v. Continuing..", e)
+		r.states.Cleanup()
+		logp.Debug("registrar", "Registrar states cleaned up.")
+		if err := r.writeRegistry(); err != nil {
+			logp.Err("Writing of registry returned error: %v. Continuing...", err)
 		}
 	}
 }
@@ -224,6 +221,7 @@ func (r *Registrar) writeRegistry() error {
 		return err
 	}
 
+	// First clean up states
 	states := r.states.GetStates()
 
 	encoder := json.NewEncoder(f)

@@ -26,9 +26,14 @@ type Logstashbeat struct {
 	urls []*url.URL
 
 	Node struct {
-		events  bool
-		jvm     bool
-		process bool
+		Stats struct {
+			events  bool
+			jvm     bool
+			process bool
+			mem     bool
+		}
+		pipeline bool
+		jvm      bool
 	}
 }
 
@@ -85,10 +90,34 @@ func (bt *Logstashbeat) Setup(b *beat.Beat) error {
 		bt.urls[i] = u
 	}
 
-	if bt.beatConfig.Logstashbeat.Node.Events != nil {
-		bt.Node.events = *bt.beatConfig.Logstashbeat.Node.Events
+	if bt.beatConfig.Logstashbeat.Node.Stats.Events != nil {
+		bt.Node.Stats.events = *bt.beatConfig.Logstashbeat.Node.Stats.Events
 	} else {
-		bt.Node.events = true
+		bt.Node.Stats.events = true
+	}
+
+	if bt.beatConfig.Logstashbeat.Node.Stats.Jvm != nil {
+		bt.Node.Stats.jvm = *bt.beatConfig.Logstashbeat.Node.Stats.Jvm
+	} else {
+		bt.Node.Stats.jvm = true
+	}
+
+	if bt.beatConfig.Logstashbeat.Node.Stats.Process != nil {
+		bt.Node.Stats.process = *bt.beatConfig.Logstashbeat.Node.Stats.Process
+	} else {
+		bt.Node.Stats.process = true
+	}
+
+	if bt.beatConfig.Logstashbeat.Node.Stats.Mem != nil {
+		bt.Node.Stats.mem = *bt.beatConfig.Logstashbeat.Node.Stats.Mem
+	} else {
+		bt.Node.Stats.mem = true
+	}
+
+	if bt.beatConfig.Logstashbeat.Node.Pipeline != nil {
+		bt.Node.pipeline = *bt.beatConfig.Logstashbeat.Node.Pipeline
+	} else {
+		bt.Node.pipeline = true
 	}
 
 	if bt.beatConfig.Logstashbeat.Node.Jvm != nil {
@@ -97,22 +126,19 @@ func (bt *Logstashbeat) Setup(b *beat.Beat) error {
 		bt.Node.jvm = true
 	}
 
-	if bt.beatConfig.Logstashbeat.Node.Process != nil {
-		bt.Node.process = *bt.beatConfig.Logstashbeat.Node.Process
-	} else {
-		bt.Node.process = true
-	}
-
-	if !bt.Node.events && !bt.Node.jvm && !bt.Node.process {
+	if !bt.Node.Stats.events && !bt.Node.Stats.jvm && !bt.Node.Stats.process && !bt.Node.Stats.mem && !bt.Node.pipeline && !bt.Node.jvm {
 		return errors.New("Invalid configuration. Nothing to request! Check your configuration file.")
 	}
 
 	logp.Debug(selector, "Init configuration logstashbeat")
 	logp.Debug(selector, "Period %v\n", bt.period)
 	logp.Debug(selector, "URLs %v", bt.urls)
-	logp.Debug(selector, "Node Events statistics %t\n", bt.Node.events)
+	logp.Debug(selector, "NodeStats Events statistics %t\n", bt.Node.Stats.events)
+	logp.Debug(selector, "NodeStats JVM statistics %t\n", bt.Node.Stats.jvm)
+	logp.Debug(selector, "NodeStats Process statistics %t\n", bt.Node.Stats.process)
+	logp.Debug(selector, "NodeStats Mem statistics %t\n", bt.Node.Stats.mem)
 	logp.Debug(selector, "Node JVM statistics %t\n", bt.Node.jvm)
-	logp.Debug(selector, "Node Process statistics %t\n", bt.Node.process)
+	logp.Debug(selector, "Node Pipeline statistics %t\n", bt.Node.pipeline)
 
 	return nil
 }
@@ -135,7 +161,7 @@ func (bt *Logstashbeat) Run(b *beat.Beat) error {
 
 				timerStart := time.Now()
 
-				if bt.Node.jvm {
+				if bt.Node.Stats.jvm {
 					logp.Debug(selector, "Node/stats/jvm for url: %v", u)
 					jvm, err := bt.GetNodeStatsJVM(*u)
 					if err != nil {
@@ -154,7 +180,7 @@ func (bt *Logstashbeat) Run(b *beat.Beat) error {
 					}
 				}
 
-				if bt.Node.events {
+				if bt.Node.Stats.events {
 					logp.Debug(selector, "Node/stats/events for url: %v", u)
 					e, err := bt.GetNodeStatsEvents(*u)
 					if err != nil {
@@ -173,7 +199,7 @@ func (bt *Logstashbeat) Run(b *beat.Beat) error {
 					}
 				}
 
-				if bt.Node.process {
+				if bt.Node.Stats.process {
 					logp.Debug(selector, "Node/stats/process for url: %v", u)
 					p, err := bt.GetNodeStatsProcess(*u)
 					if err != nil {
@@ -188,6 +214,63 @@ func (bt *Logstashbeat) Run(b *beat.Beat) error {
 							"process":    p.Process,
 						}
 						logp.Debug(selectorDetail, "Published Process detail: %+v", event)
+						bt.client.PublishEvent(event)
+					}
+				}
+
+				if bt.Node.Stats.mem {
+					logp.Debug(selector, "Node/stats/mem for url: %v", u)
+					m, err := bt.GetNodeStatsMem(*u)
+					if err != nil {
+						logp.Err("Error reading Node/stats/mem metrics: %v", err)
+					} else {
+						logp.Debug(selectorDetail, "Node/stats/mem metrics detail: %+v", m)
+
+						event := common.MapStr{
+							"@timestamp": common.Time(time.Now()),
+							"type":       "nodeStats",
+							"url":        u.String(),
+							"mem":        m.Mem,
+						}
+						logp.Debug(selectorDetail, "Published Mem detail: %+v", event)
+						bt.client.PublishEvent(event)
+					}
+				}
+
+				if bt.Node.pipeline {
+					logp.Debug(selector, "Node/pipeline for url: %v", u)
+					p, err := bt.GetNodePipeline(*u)
+					if err != nil {
+						logp.Err("Error reading Node/pipeline metrics: %v", err)
+					} else {
+						logp.Debug(selectorDetail, "Node/pipeline metrics detail: %+v", p)
+
+						event := common.MapStr{
+							"@timestamp": common.Time(time.Now()),
+							"type":       "node",
+							"url":        u.String(),
+							"pipeline":   p.Pipeline,
+						}
+						logp.Debug(selectorDetail, "Published Pipeline detail: %+v", event)
+						bt.client.PublishEvent(event)
+					}
+				}
+
+				if bt.Node.jvm {
+					logp.Debug(selector, "Node/jvm for url: %v", u)
+					j, err := bt.GetNodeJVM(*u)
+					if err != nil {
+						logp.Err("Error reading Node/jvm metrics: %v", err)
+					} else {
+						logp.Debug(selectorDetail, "Node/jvm metrics detail: %+v", j)
+
+						event := common.MapStr{
+							"@timestamp": common.Time(time.Now()),
+							"type":       "node",
+							"url":        u.String(),
+							"jvm":        j.Jvm,
+						}
+						logp.Debug(selectorDetail, "Published JVM detail: %+v", event)
 						bt.client.PublishEvent(event)
 					}
 				}

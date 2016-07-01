@@ -8,11 +8,14 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/processor"
 	"github.com/elastic/beats/libbeat/common"
+
+	"github.com/dustin/go-humanize"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 var (
 	defaultConfig = harvesterConfig{
-		BufferSize:      16 << 10, // 16384
+		BufferSize:      16 * humanize.KiByte,
 		DocumentType:    "log",
 		InputType:       cfg.DefaultInputType,
 		TailFiles:       false,
@@ -20,8 +23,11 @@ var (
 		BackoffFactor:   2,
 		MaxBackoff:      10 * time.Second,
 		CloseOlder:      1 * time.Hour,
-		ForceCloseFiles: false,
 		MaxBytes:        10 * (1 << 20), // 10MB
+		CloseRemoved:    false,
+		CloseRenamed:    false,
+		CloseEOF:        false,
+		ForceCloseFiles: false,
 	}
 )
 
@@ -36,6 +42,9 @@ type harvesterConfig struct {
 	BackoffFactor        int                        `config:"backoff_factor" validate:"min=1"`
 	MaxBackoff           time.Duration              `config:"max_backoff" validate:"min=0,nonzero"`
 	CloseOlder           time.Duration              `config:"close_older"`
+	CloseRemoved         bool                       `config:"close_removed"`
+	CloseRenamed         bool                       `config:"close_renamed"`
+	CloseEOF             bool                       `config:"close_eof"`
 	ForceCloseFiles      bool                       `config:"force_close_files"`
 	ExcludeLines         []*regexp.Regexp           `config:"exclude_lines"`
 	IncludeLines         []*regexp.Regexp           `config:"include_lines"`
@@ -45,6 +54,13 @@ type harvesterConfig struct {
 }
 
 func (config *harvesterConfig) Validate() error {
+
+	// DEPRECATED: remove in 6.0
+	if config.ForceCloseFiles {
+		config.CloseRemoved = true
+		config.CloseRenamed = true
+		logp.Warn("DEPRECATED: force_close_files was set to true. Use close_removed + close_rename")
+	}
 
 	// Check input type
 	if _, ok := cfg.ValidInputType[config.InputType]; !ok {
